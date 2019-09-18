@@ -2,6 +2,8 @@ clear all
 close all
 clc
 
+test = 1;
+
 format long;
 
 addpath('./parameterFiles')
