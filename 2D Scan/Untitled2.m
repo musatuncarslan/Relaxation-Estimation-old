@@ -13,8 +13,8 @@ MPIparams = setMPIParams(Physicsparams); % MPI machine parameters
 SPIOparams = setSPIOParams(Physicsparams); % SPIO parameters
 Simparams = setSimulationParams(MPIparams, Physicsparams); % Simulation parameters
 
-
-fileName = ['./signalSaveFolder/signal_' datestr(now,'dd-mmmm-yyyy_HH-MM-SS') '.mat'];
+filePath = '/google-drive://musatuncarslan@gmail.com/1QAQPO5TprmhvEHJeyWcYHjR7QZ4veViE/';
+fileName = [filePath 'signal_' datestr(now,'dd-mmmm-yyyy_HH-MM-SS') '.mat'];
 % [fileObj, signal_size, chunk] = setFileParams(fileName, Physicsparams, MPIparams, SPIOparams, Simparams);
 fileObj = matfile(fileName);
 fileObj.Properties.Writable = true;
@@ -26,7 +26,7 @@ numIters = Simparams.endIter-Simparams.startIter;
 fileObj.horizontalSignal_mpi_mat(numIters,signal_size) = 0;
 fileObj.FFP_x(numIters,signal_size) = 0;
 fileObj.FFP_z(numIters,signal_size) = 0;
-fileObj.FFP_speed(numIters,signal_size) = 0;
+fileObj.FFP_speed(numIters,signal_size)  = 0;
 fileObj.FFP_angle(numIters,signal_size) = 0;
 
 
@@ -52,8 +52,15 @@ for k = Simparams.startIter:Simparams.endIter
 
 
     % generate MPI signals
-    [signals] = generateSignals(colinearIMG, transverseIMG, FFPparams, MPIparams, SPIOparams, Simparams);
-
+    [signals_sep] = generateSignals(colinearIMG, transverseIMG, FFPparams, MPIparams, SPIOparams, Simparams);
+    
+    signals = struct;
+    signals.horizontalSignal = zeros(1, size(signals_sep, 2));
+    signals.verticalSignal = zeros(1, size(signals_sep, 2));
+    for l=1:length(SPIOparams.diameter)
+        signals.horizontalSignal = signals.horizontalSignal + signals_sep.horizontalSignal(l, :);
+        signals.verticalSignal = signals.verticalSignal + signals_sep.verticalSignal(l, :);
+    end
 
     % save signals to the file
     fprintf('Writing %d of %d, ',nout,signal_size*Simparams.numIters);

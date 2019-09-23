@@ -4,7 +4,7 @@ clc
 
 format long;
 
-filename = ['./signalSaveFolder/', 'signal_17-September-2019_16-18-34'];
+filename = ['./signalSaveFolder/', 'signal_22-September-2019_21-26-18'];
 matObj = matfile(filename);
 
 % get simulation parameters
@@ -45,7 +45,7 @@ tau_est_linear = [];
 tau_lin_weighted = [];
 FFP_x = [];
 FFP_z = [];
-for k=1:numIters
+for k=10:numIters
     tic
     numSamplePerDrivePeriod = 1/f_drive*fs_mpi;
     idx = (numSamplePerDrivePeriod*numPeriodsPerIter*(k-1)+1:numSamplePerDrivePeriod*k*numPeriodsPerIter);
@@ -62,17 +62,20 @@ for k=1:numIters
         periodIdx = (numSamplePerDrivePeriod*(l-1)+1:numSamplePerDrivePeriod*l);
         partialSig = sig(periodIdx);
 
+        L = length(partialSig)/2;
+        f = (0:L-1)*(fs_mpi*interp_coeff)/L-(fs_mpi*interp_coeff)/2;
+        f = fftshift(f);
+        
+        
         pos = partialSig(1:end/2); 
         neg = partialSig(end/2+1:end);
-        S2=fft(neg);
+        S2=fft(neg).*exp(-1i*f*15/fs_mpi);
         S1=fft(pos);
         sum_val = (S1+conj(S2));
         sub_val = (conj(S2)-S1);
 
 
-        L = length(sum_val);
-        f = (0:L-1)*(fs_mpi*interp_coeff)/L-(fs_mpi*interp_coeff)/2;
-        f = fftshift(f);
+
 
         a = 1i*2*pi*f(sig_contribution).*sub_val(sig_contribution);
         b = sum_val(sig_contribution);
@@ -109,9 +112,11 @@ tau_lin_weighted = transpose(tau_lin_weighted(:, 1:end))*1e6;
 SPIOdistribution = SPIOparams.SPIOdistribution;
 % surf(SPIOdistribution(:,:, 1)); view(2); shading interp
 
-tau = SPIOparams.tau;
-tau_image = SPIOdistribution(:, :, 1)*tau(1);
-
+tau = SPIOparams.tau*1e6;
+tau_image = zeros(size(SPIOdistribution(:,:,1)));
+for k=1:length(SPIOparams.diameter)
+    tau_image = tau_image + SPIOdistribution(:, :, k)*tau(k);
+end
 img_size = size(tau_image); psf_size = Simparams.psf_size;
 if img_size(1) < psf_size(1)
    tau_image = padarray(tau_image,[floor((psf_size(1)-img_size(1))/2), 0],0,'both');
@@ -136,7 +141,7 @@ plot(z_axis(:), tau_est_frequency(:), 'linewidth', 2, 'marker', 'o'); hold on;
 plot(z_axis(:), tau_est_linear(:), 'linewidth', 2, 'marker', 'd'); hold on; 
 plot(z_axis(:), tau_lin_weighted(:), 'linewidth', 2, 'marker', '*'); hold on; 
 plot(lin_z_axis, tau_image(:, 256), 'linewidth', 2)
- xlabel('z-axis (m)'); ylabel('\tau (\mu s)'); axis tight; legend('Frequency Estimated \tau', 'Linear Estimated \tau', 'Weighted Linear Estimated \tau', 'Original \tau')
+xlabel('z-axis (m)'); ylabel('\tau (\mu s)'); axis tight; legend('Frequency Estimated \tau', 'Linear Estimated \tau', 'Weighted Linear Estimated \tau', 'Original \tau')
 
 if strcmp(MPIparams.ffp_type, 'linear_rastered')
     type_str = 'Rastered Linear';
