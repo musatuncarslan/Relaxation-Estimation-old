@@ -28,9 +28,6 @@ function [colinearPSF,transversePSF, X, Z] = generatePSF(MPIparams, SPIOparams, 
         kb = 1.3806488e-23;
         T = 300;
         k = (0.1*pi*d^3)/(kb*T);
-
-
-
         endTime = 0;
 
         for l=1:numAngle

@@ -13,7 +13,7 @@ MPIparams = setMPIParams(Physicsparams); % MPI machine parameters
 SPIOparams = setSPIOParams(Physicsparams); % SPIO parameters
 Simparams = setSimulationParams(MPIparams, Physicsparams); % Simulation parameters
 
-filePath = '/google-drive://musatuncarslan@gmail.com/1QAQPO5TprmhvEHJeyWcYHjR7QZ4veViE/';
+filePath = 'C:\Users\Orion\Google Drive\Phd\signalSaveFolder\';
 fileName = [filePath 'signal_' datestr(now,'dd-mmmm-yyyy_HH-MM-SS') '.mat'];
 % [fileObj, signal_size, chunk] = setFileParams(fileName, Physicsparams, MPIparams, SPIOparams, Simparams);
 fileObj = matfile(fileName);
@@ -38,7 +38,7 @@ for k = Simparams.startIter:Simparams.endIter
     tic
     
     t = ((k-1)*Simparams.numSamplesPerIter:k*Simparams.numSamplesPerIter)/Physicsparams.fs;
-    
+    t = [t(1:floor(end/2)) t(floor(end/2)+2:end)];
     FFPparams = generateFFP(t, MPIparams, Simparams);
    
     % calculate colinear and trasnverse PSF(s) for each unique angle

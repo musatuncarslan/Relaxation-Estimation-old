@@ -28,7 +28,7 @@ function [FFPparams] = generateFFP(t, MPIparams, Simparams)
     xDifference = diff(FFP_x, 1, 2);
 
     FFP_speed = sqrt(zDifference.^2 + xDifference.^2);
-    FFP_angle = wrapTo360(round(atan2d(xDifference, zDifference), 1));    
+    FFP_angle = wrapTo360(round(atan2d(xDifference, zDifference), 2));    
     
     FFPparams.FFP_x = FFP_x;
     FFPparams.FFP_z = FFP_z;

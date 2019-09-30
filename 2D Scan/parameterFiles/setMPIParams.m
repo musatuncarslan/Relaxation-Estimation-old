@@ -2,7 +2,7 @@ function MPIparams = setMPIParams(Physicsparams)
     MPIparams = struct;
 
 
-    MPIparams.ffp_type = 'linear_rastered';
+    MPIparams.ffp_type = 'fixed';
     % gradients (T/m) (current scanner)
     MPIparams.Gxx = 4.8;
     MPIparams.Gyy = 2.4;
