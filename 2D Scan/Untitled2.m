@@ -20,7 +20,7 @@ fileObj = matfile(fileName);
 fileObj.Properties.Writable = true;
 
 % create space for the simulation data
-signal_size = Simparams.numSamplesPerIter/Simparams.downsample;
+signal_size = Simparams.numSamplesPerIter/Simparams.downsample+1;
 chunk = Simparams.numSamplesPerIter/Simparams.downsample;
 numIters = Simparams.endIter-Simparams.startIter;
 fileObj.horizontalSignal_mpi_mat(numIters,signal_size) = 0;
@@ -37,8 +37,7 @@ count = 1;
 for k = Simparams.startIter:Simparams.endIter
     tic
     
-    t = ((k-1)*Simparams.numSamplesPerIter:k*Simparams.numSamplesPerIter)/Physicsparams.fs;
-    t = [t(1:floor(end/2)) t(floor(end/2)+2:end)];
+    t = ((k-1)*Simparams.numSamplesPerIter:(k*Simparams.numSamplesPerIter+Simparams.downsample))/Physicsparams.fs;
     FFPparams = generateFFP(t, MPIparams, Simparams);
    
     % calculate colinear and trasnverse PSF(s) for each unique angle

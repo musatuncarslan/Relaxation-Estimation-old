@@ -20,8 +20,8 @@ function MPIparams = setMPIParams(Physicsparams)
     MPIparams.FOV_x = 0.05; % FOV in x-axis (meters)
     
     % for linear rastered
-    MPIparams.time = 0.006; % time (seconds)
-    MPIparams.traversedFOVz = [-0.03 0.03]; % traversed fov in the simulation in z-axis (m)
+    MPIparams.time = 6; % time (seconds)
+    MPIparams.traversedFOVz = [-0.003 0.003]; % traversed fov in the simulation in z-axis (m)
     % for fixed
     MPIparams.cycle = 5; % number of cycles on the fixed position
     MPIparams.ffpPosition = [0, 0]; % ffp position in x and z coordinates

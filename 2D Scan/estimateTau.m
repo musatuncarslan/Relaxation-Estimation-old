@@ -4,7 +4,11 @@ clc
 
 format long;
 
-filename = ['./signalSaveFolder/', 'signal_22-September-2019_21-26-18'];
+addpath('./parameterFiles')
+addpath('./signalGenerationFiles')
+
+filePath = 'C:\Users\Orion\Google Drive\Phd\signalSaveFolder\';
+filename = [filePath, 'signal_01-October-2019_16-05-08'];
 matObj = matfile(filename);
 
 % get simulation parameters
@@ -38,28 +42,28 @@ interp_coeff = 1;
 numPeriodsPerIter = numPeriod/numIters;
 numSamplePerDrivePeriod = 1/f_drive*fs_mpi;
 pos_idx = (numSamplePerDrivePeriod/2:numSamplePerDrivePeriod:numSamplesPerIter)-50;
-sig_contribution = 2:5;
+sig_contribution = 2:4;
 count = 1;
 tau_est_frequency = [];
 tau_est_linear = [];
 tau_lin_weighted = [];
 FFP_x = [];
 FFP_z = [];
-for k=10:numIters
+for k=1:numIters
     tic
     numSamplePerDrivePeriod = 1/f_drive*fs_mpi;
-    idx = (numSamplePerDrivePeriod*numPeriodsPerIter*(k-1)+1:numSamplePerDrivePeriod*k*numPeriodsPerIter);
+    idx = (numSamplePerDrivePeriod*numPeriodsPerIter*(k-1)+1:numSamplePerDrivePeriod*k*numPeriodsPerIter+1);
     t_sig = idx/fs_mpi;
 
 
 
     numSamplePerDrivePeriod = 1/f_drive*(fs_mpi*interp_coeff);
-    idx_interp = (numPeriodsPerIter*numSamplePerDrivePeriod*(k-1)+1:numSamplePerDrivePeriod*numPeriodsPerIter*k);
+    idx_interp = (numPeriodsPerIter*numSamplePerDrivePeriod*(k-1)+1:numSamplePerDrivePeriod*numPeriodsPerIter*k+1);
     t_interp = idx_interp/fs_mpi/interp_coeff;
 
     sig = interp1(t_sig, matObj.horizontalSignal_mpi_mat(k, 1:numSamplesPerIter),t_interp, 'spline');
     for l=1:numPeriodsPerIter
-        periodIdx = (numSamplePerDrivePeriod*(l-1)+1:numSamplePerDrivePeriod*l);
+        periodIdx = (numSamplePerDrivePeriod*(l-1)+1:numSamplePerDrivePeriod*l+1);
         partialSig = sig(periodIdx);
 
         L = length(partialSig)/2;
@@ -67,9 +71,9 @@ for k=10:numIters
         f = fftshift(f);
         
         
-        pos = partialSig(1:end/2); 
-        neg = partialSig(end/2+1:end);
-        S2=fft(neg).*exp(-1i*f*15/fs_mpi);
+        pos = partialSig(1:floor(end/2)); 
+        neg = partialSig(floor(end/2)+2:end);
+        S2=fft(neg);
         S1=fft(pos);
         sum_val = (S1+conj(S2));
         sub_val = (conj(S2)-S1);
@@ -136,7 +140,7 @@ lin_z_axis = linspace(-image_FOV_z/2, image_FOV_z/2, size(tau_image, 1));
 z_vals = lin_z_axis(find(tau_image(:, 256) == 2));
 
 
-f = figure('Position', [560 240 800 600]);
+fig = figure('Position', [560 240 800 600]);
 plot(z_axis(:), tau_est_frequency(:), 'linewidth', 2, 'marker', 'o'); hold on; 
 plot(z_axis(:), tau_est_linear(:), 'linewidth', 2, 'marker', 'd'); hold on; 
 plot(z_axis(:), tau_lin_weighted(:), 'linewidth', 2, 'marker', '*'); hold on; 
@@ -160,7 +164,7 @@ fs_mpi_str = ['F_s_{mpi} = ' num2str(fs_mpi*1e-6) ' MHz'];
 str = {type_str, '% Parameters', gradent_str, diameter_str, Bp_str, f_drive_str, ...
     fs_str, fs_mpi_str, slew_rate_str};
 
-legend_pos = f.Children(1).Position;
+legend_pos = fig.Children(1).Position;
 pos = [legend_pos(1), 0.2, 0.4 0.3];
 annotation('textbox', pos, 'String',str,'FitBoxToText','on');
 % ylim([1.85 2]); xlim([-0.03 0.03])
