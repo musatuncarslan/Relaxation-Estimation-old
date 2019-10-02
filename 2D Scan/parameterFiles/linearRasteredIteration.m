@@ -37,7 +37,7 @@ function [startIter, endIter, numSamplesPerIter] = linearRasteredIteration(MPIpa
     numIters = numIters(ceil(end/2));
     numSamplesPerIter = fs*total_time/numIters;
 
-    startIter = (t1*fs)/numSamplesPerIter;
+    startIter = round((t1*fs)/numSamplesPerIter);
     endIter = startIter+numIters;
     
 end

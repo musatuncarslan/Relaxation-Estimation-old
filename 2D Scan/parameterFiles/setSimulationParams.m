@@ -16,7 +16,7 @@ function [Simparams] = setSimulationParams(MPIparams, Physicsparams)
     end
     
     Simparams.startIter = startIter;
-    Simparams.endIter = endIter;
+    Simparams.endIter = endIter-1;
     Simparams.numSamplesPerIter = numSamplesPerIter;
     Simparams.numIters = numIters;
 

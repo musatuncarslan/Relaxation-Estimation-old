@@ -8,7 +8,7 @@ addpath('./parameterFiles')
 addpath('./signalGenerationFiles')
 
 filePath = 'C:\Users\Orion\Google Drive\Phd\signalSaveFolder\';
-filename = [filePath, 'signal_01-October-2019_16-05-08'];
+filename = [filePath, 'signal_02-October-2019_14-27-25'];
 matObj = matfile(filename);
 
 % get simulation parameters
@@ -149,7 +149,7 @@ xlabel('z-axis (m)'); ylabel('\tau (\mu s)'); axis tight; legend('Frequency Esti
 
 if strcmp(MPIparams.ffp_type, 'linear_rastered')
     type_str = 'Rastered Linear';
-    slew_rate_str = ['R_s = ' num2str(abs(FOV_z/time*Gzz)) ' T/s'];
+    slew_rate_str = ['R_s = ' num2str(MPIparams.slewRate ) ' T/s'];
 else
     type_str = 'Fixed FFP';
     slew_rate_str = ['R_S = n/a'];

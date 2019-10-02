@@ -6,7 +6,7 @@ function SPIOparams = setSPIOParams(Physicsparams)
     
     % spio distribution in 2D
     SPIOparams.SPIOdistribution = zeros(512, 512, 2); 
-    SPIOparams.SPIOdistribution(256, 256-20:256+20, 1) = 1;
+    SPIOparams.SPIOdistribution(256-20:256+20, 256, 1) = 1;
     SPIOparams.SPIOdistribution(306, 256, 2) = 1;
 %     SPIOparams.SPIOdistribution(1:40, (225:275), 1) = 1;
 %     SPIOparams.SPIOdistribution((1:40)+100, (225:275), 2) = 1;
