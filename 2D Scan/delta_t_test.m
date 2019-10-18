@@ -10,12 +10,14 @@ addpath('./signalGenerationFiles')
 % parameters
 Physicsparams = setPhysicsParams(); % physics parameters
 MPIparams = setMPIParams(Physicsparams); % MPI machine parameters
-SPIOparams = setSPIOParams(Physicsparams); % SPIO parameters
+SPIOparams = setSPIOParams(Physicsparams, 256); % SPIO parameters
 Simparams = setSimulationParams(MPIparams, Physicsparams); % Simulation parameters
 
 fs = MPIparams.fs; f_d = MPIparams.f_drive; 
 t = (0:fs*5/f_d-1)/fs; % time axis for error calculation
-slewRate = 0:0.25:25; % T/s
+
+
+slewRate = 0:0.5:20; % T/s
 Hp=MPIparams.Bp/Physicsparams.mu0; % magnetization moment
 G=MPIparams.Gzz/Physicsparams.mu0; % gradient
 MPIparams.driveMag=Hp/G; % extent of the drive field
@@ -55,13 +57,14 @@ for R_idx = 1:length(R)
 end
 
 figure; 
-subplot(2,2,1); plot(slewRate, del_t*1000); axis tight;
+subplot(2,1,1); plot(slewRate, del_t*1000); axis tight;
 xlabel('Slew Rate (T/s)'); ylabel('\Delta t (ms)');
 
-subplot(2,2,2); plot(slewRate, err); axis tight;
+subplot(2,1,2); plot(slewRate, err); axis tight;
 xlabel('Slew Rate (T/s)'); ylabel('Absolute Error');    
+ylim([0, 10^-3])
 
-subplot(2,2,[3 4]); 
+figure; 
 plot(t, -MPIparams.driveMag*cos(2*pi*f_d*t)+R(end)*t)
 hold on
 plot(t(t_idx), -MPIparams.driveMag*cos(2*pi*f_d*t(t_idx)) + R(end)*t(t_idx), '*')

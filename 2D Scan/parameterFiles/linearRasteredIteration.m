@@ -16,14 +16,15 @@ function [startIter, endIter, numSamplesPerIter] = linearRasteredIteration(MPIpa
         count = count + 1;
         divider = divider*10;   
     end
+    count = count;
 
     robotSpeed = FOV_z/time; % robot arm movement speed (m/s)
     bFOVz = -FOV_z/2; % beginning point of FOV in z-axis (m)
     t1 = round((traversedFOVz(1)-bFOVz)/robotSpeed, count);
     t2 = round((traversedFOVz(2)-bFOVz)/robotSpeed, count);
-    total_time = round(t2-t1, count);
+    total_time = (traversedFOVz(2)-traversedFOVz(1))/robotSpeed;
 
-    numPeriod = total_time*f_drive; % number of periods on the selected portion of a single line
+    numPeriod = round(total_time*f_drive); % number of periods on the selected portion of a single line
     a = gcd(fs*total_time, numPeriod); % find the greatest common divisor of total number of samples and total number of periods per line
     div = divisors(a); % find the divisors of gcd (these numbers divide both total number of samples and number of periods per line)
     numIters = div(div>100 & div < 1000); % use the middle number of divisors as a rule of thumb for number of iterations to solve the whole problem

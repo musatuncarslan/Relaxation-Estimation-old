@@ -1,8 +1,12 @@
 function MPIparams = setMPIParams(Physicsparams)
     MPIparams = struct;
 
-
-    MPIparams.ffp_type = 'linear_rastered';
+    MPIparams.slewRate = 20; % slew rate (T/s)
+    if MPIparams.slewRate == 0
+        MPIparams.ffp_type = 'fixed';
+    else
+        MPIparams.ffp_type = 'linear_rastered';
+    end
     % gradients (T/m) (current scanner)
     MPIparams.Gxx = 4.8;
     MPIparams.Gyy = 2.4;
@@ -19,13 +23,16 @@ function MPIparams = setMPIParams(Physicsparams)
     MPIparams.fs = 2e6; % sample frequency of the MPI system (Hz)
     MPIparams.FOV_z = 0.06; % FOV in z-axis (meters) (bore axis)
     MPIparams.FOV_x = 0.05; % FOV in x-axis (meters)
-    MPIparams.slewRate = 24; % slew rate (T/s)
+    
     
     % for linear rastered
     MPIparams.time = MPIparams.FOV_z*MPIparams.Gzz/MPIparams.slewRate; % time (seconds)
-    MPIparams.traversedFOVz = [-0.03 0.03]; % traversed fov in the simulation in z-axis (m)
+    MPIparams.traversedFOVz = [-MPIparams.FOV_z/MPIparams.time/MPIparams.f_drive/2 MPIparams.FOV_z/MPIparams.time/MPIparams.f_drive/2]; % traversed fov in the simulation in z-axis (m)
     % for fixed
-    MPIparams.cycle = 5; % number of cycles on the fixed position
+    MPIparams.cycle = 1; % number of cycles on the fixed position
     MPIparams.ffpPosition = [0, 0]; % ffp position in x and z coordinates
+    
+    % related to time constant estimation
+    MPIparams.interp_coeff = 10;
    
 end
