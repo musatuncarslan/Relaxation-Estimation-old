@@ -9,64 +9,37 @@ addpath('./signalGenerationFiles')
 
 % parameters
 Physicsparams = setPhysicsParams(); % physics parameters
-MPIparams = setMPIParams(Physicsparams); % MPI machine parameters
-SPIOparams = setSPIOParams(Physicsparams, 256); % SPIO parameters
+MPIparams = setMPIParams(Physicsparams, 20); % MPI machine parameters
+SPIOparams = setSPIOParams(Physicsparams, 256, 2e-6); % SPIO parameters
 Simparams = setSimulationParams(MPIparams, Physicsparams); % Simulation parameters
 
-fs = MPIparams.fs; f_d = MPIparams.f_drive; 
-t = (0:fs*5/f_d-1)/fs; % time axis for error calculation
-
-
-slewRate = 0:0.5:20; % T/s
+slewRate = 0:0.25:20; % T/s
 Hp=MPIparams.Bp/Physicsparams.mu0; % magnetization moment
 G=MPIparams.Gzz/Physicsparams.mu0; % gradient
 MPIparams.driveMag=Hp/G; % extent of the drive field
 
 R = slewRate/MPIparams.Gzz;
 
-p = zeros(1, 21);
-sign = zeros(1,ceil(length(p)/2));
-for n=1:ceil(length(p)/2)
-    sign(n) = (-1).^(n-1);
+
+f_d = MPIparams.f_drive; 
+fs = 100e6;
+t = (0:fs*1/f_d-1)/fs; % time axis for error calculation
+
+
+
+for l=1:length(R)
+    del_t(l) = findShift(R(l), f_d, MPIparams);
+    err(l) = abs(MPIparams.driveMag*cos(2*pi*f_d/4/f_d) - (MPIparams.driveMag*cos(2*pi*f_d*(1/(4*f_d) + del_t(l))) + R(l)*del_t(l)));
+
 end
-
-arg = 2*pi*f_d;
-
-count = 1;
-for k=1:length(p)
-    if mod(k, 2) == 1
-        p(k) = sign(count)*arg^k/factorial(k);
-        count = count + 1;
-    else
-        p(k) = 0;
-    end
-end
-p = MPIparams.driveMag*flip(p);
-
-t_idx = 251;
-for R_idx = 1:length(R)
-    p_temp = p;
-    p_temp(end) = p_temp(end)+R(R_idx);
-    roots_p = roots(p_temp);
-    real_idx = imag(roots_p) == 0;
-    real_roots = roots_p(real_idx);
-
-    del_t(R_idx) = real_roots(end);
-    err(R_idx) = abs((-MPIparams.driveMag*cos(2*pi*f_d*t(t_idx)) + R(R_idx)*t(t_idx)) - ...
-        (-MPIparams.driveMag*cos(2*pi*f_d*(t(t_idx)+del_t(R_idx))) + R(R_idx)*(t(t_idx) + del_t(R_idx))));  
-end
-
 figure; 
-subplot(2,1,1); plot(slewRate, del_t*1000); axis tight;
-xlabel('Slew Rate (T/s)'); ylabel('\Delta t (ms)');
+subplot(2,1,1); plot(slewRate, del_t); title('\Delta t w.r.t. Slew Rate'); xlabel('R_s (T/s)'); ylabel('\Delta t (s)')
+subplot(2,1,2); plot(slewRate, err); title('Error of Analytic solution'); xlabel('R_s (T/s)'); ylabel('Absolute Error')
 
-subplot(2,1,2); plot(slewRate, err); axis tight;
-xlabel('Slew Rate (T/s)'); ylabel('Absolute Error');    
-ylim([0, 10^-3])
-
-figure; 
-plot(t, -MPIparams.driveMag*cos(2*pi*f_d*t)+R(end)*t)
-hold on
-plot(t(t_idx), -MPIparams.driveMag*cos(2*pi*f_d*t(t_idx)) + R(end)*t(t_idx), '*')
-plot(t(t_idx)+del_t(end), -MPIparams.driveMag*cos(2*pi*f_d*(t(t_idx)+del_t(end))) + R(end)*(t(t_idx) + del_t(end)), '*')
-xlabel('Time (s)'); ylabel('FFP Position (m)');  
+figure;
+idx = length(R);
+plot(t, MPIparams.driveMag*cos(2*pi*f_d*t) + R(idx)*t); hold on;
+plot(1/4/f_d, MPIparams.driveMag*cos(2*pi*f_d/4/f_d) + R(idx)/4/f_d, '*');
+plot(1/4/f_d+del_t(idx), MPIparams.driveMag*cos(2*pi*f_d*(1/4/f_d+del_t(idx))) + R(idx)*(1/4/f_d+del_t(idx)), '*');
+title(['FFP Position w.r.t. time for R_s = ' num2str(slewRate(idx)) ' T/s'])
+ylabel('z-axis position (m)'); xlabel('t (s)'); legend('FFP movement', 'Position @ max speed', 'Analytic sol. to pos. @ max speed')

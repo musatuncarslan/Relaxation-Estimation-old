@@ -11,11 +11,11 @@ function [FFPparams] = generateFFP(t, MPIparams, Simparams)
     numSamplesPerIter = Simparams.numSamplesPerIter;
 
     if strcmp(ffp_type, 'linear_rastered')
-        FFP_x = repmat(MPIparams.ffpPosition(1), [1, numSamplesPerIter+1+Simparams.downsample*2]); % movement of FFP in x direction, for linear x is constant throughout the line
+        FFP_x = repmat(MPIparams.ffpPosition(1), [1, numSamplesPerIter+1+Simparams.downsample]); % movement of FFP in x direction, for linear x is constant throughout the line
         z = FOV_z/time*t - FOV_z/2; % robot arm movement in z direction w.r.t. time
     elseif strcmpi(ffp_type, 'fixed')
-        FFP_x = repmat(MPIparams.ffpPosition(1), [1, numSamplesPerIter+1+Simparams.downsample*2]); % movement of FFP in x direction, for linear x is constant throughout the line
-        z = repmat(MPIparams.ffpPosition(2), [1, numSamplesPerIter+1+Simparams.downsample*2]);
+        FFP_x = repmat(MPIparams.ffpPosition(1), [1, numSamplesPerIter+1+Simparams.downsample]); % movement of FFP in x direction, for linear x is constant throughout the line
+        z = repmat(MPIparams.ffpPosition(2), [1, numSamplesPerIter+1+Simparams.downsample]);
     else
         
     end

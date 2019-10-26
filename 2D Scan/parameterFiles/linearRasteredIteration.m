@@ -29,7 +29,7 @@ function [startIter, endIter, numSamplesPerIter] = linearRasteredIteration(MPIpa
     div = divisors(a); % find the divisors of gcd (these numbers divide both total number of samples and number of periods per line)
     numIters = div(div>100 & div < 1000); % use the middle number of divisors as a rule of thumb for number of iterations to solve the whole problem
     if isempty(numIters)
-        numIters = div(end);
+        numIters = div(1);
         msg = sprintf('Low number of iterations, iteration number is chosen as highest possible, %i.\n', numIters);
         fprintf(msg);
     end 

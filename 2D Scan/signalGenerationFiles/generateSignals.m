@@ -62,9 +62,9 @@ function [signal] = generateSignals(colinearIMG, transverseIMG, FFPparams, MPIpa
         verticalSignal(k,:) = verticalSignal_temp(1:end-length(r_t{k})+1);
     end
     
-    signal.colinearSignal = colinearSignal(:, 2:Simparams.downsample:end);
-    signal.transverseSignal = transverseSignal(:, 2:Simparams.downsample:end);
-    signal.horizontalSignal = horizontalSignal(:, 2:Simparams.downsample:end);
-    signal.verticalSignal = verticalSignal(:, 2:Simparams.downsample:end);
+    signal.colinearSignal = colinearSignal(:, 1:Simparams.downsample:end);
+    signal.transverseSignal = transverseSignal(:, 1:Simparams.downsample:end);
+    signal.horizontalSignal = horizontalSignal(:, 1:Simparams.downsample:end);
+    signal.verticalSignal = verticalSignal(:, 1:Simparams.downsample:end);
     
 end

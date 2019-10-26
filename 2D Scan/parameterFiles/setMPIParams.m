@@ -1,7 +1,7 @@
-function MPIparams = setMPIParams(Physicsparams)
+function MPIparams = setMPIParams(Physicsparams, rs)
     MPIparams = struct;
 
-    MPIparams.slewRate = 20; % slew rate (T/s)
+    MPIparams.slewRate = rs; % slew rate (T/s)
     if MPIparams.slewRate == 0
         MPIparams.ffp_type = 'fixed';
     else

@@ -9,12 +9,12 @@ addpath('./signalGenerationFiles')
 
 % parameters
 Physicsparams = setPhysicsParams(); % physics parameters
-MPIparams = setMPIParams(Physicsparams); % MPI machine parameters
+MPIparams = setMPIParams(Physicsparams, 20); % MPI machine parameters
 
 fig = figure('Position', [560 240 800 600]); hold on;
-pos =256-50:256+50;
+pos = 512-80:512+80;
 for pos_idx=1:length(pos)
-    SPIOparams = setSPIOParams(Physicsparams, pos(pos_idx)); % SPIO parameters
+    SPIOparams = setSPIOParams(Physicsparams, pos(pos_idx), 2e-6); % SPIO parameters
     Simparams = setSimulationParams(MPIparams, Physicsparams); % Simulation parameters
 
     filePath = 'C:\Users\Orion\Google Drive\Phd\signalSaveFolder\';
@@ -25,7 +25,7 @@ for pos_idx=1:length(pos)
     fileObj.Properties.Writable = true;
 
     % create space for the simulation data
-    signal_size = Simparams.numSamplesPerIter/Simparams.downsample+2;
+    signal_size = Simparams.numSamplesPerIter/Simparams.downsample+1;
     chunk = Simparams.numSamplesPerIter/Simparams.downsample;
     numIters = Simparams.numIters;
     fileObj.horizontalSignal_mpi_mat(numIters,signal_size) = 0;
@@ -38,11 +38,10 @@ for pos_idx=1:length(pos)
     % start simulation
     nout = 0;
     count = 1;
-
     for k = Simparams.startIter:Simparams.endIter
         tic
 
-        t = ((k-1)*Simparams.numSamplesPerIter:(k*Simparams.numSamplesPerIter+2*Simparams.downsample))/Physicsparams.fs;
+        t = ((k-1)*Simparams.numSamplesPerIter+1:(k*Simparams.numSamplesPerIter+Simparams.downsample+1))/Physicsparams.fs;
         FFPparams = generateFFP(t, MPIparams, Simparams);
 
         % calculate colinear and trasnverse PSF(s) for each unique angle
@@ -98,13 +97,7 @@ for pos_idx=1:length(pos)
     FFP_angle = transpose(fileObj.FFP_angle); FFP_angle = FFP_angle(:);
     horizontalSignal_mpi_mat = transpose(fileObj.horizontalSignal_mpi_mat); horizontalSignal_mpi_mat = horizontalSignal_mpi_mat(:);
     verticalSignal_mpi_mat = transpose(fileObj.verticalSignal_mpi_mat); verticalSignal_mpi_mat = verticalSignal_mpi_mat(:);
-    % 
-    % collinearSignal = horizontalSignal_mpi_mat.*cosd(FFP_angle) + verticalSignal_mpi_mat.*sind(FFP_angle);
-    % plot(FFP_z, collinearSignal./FFP_angle)
-    % 
-    % 
-%     figure; scatter3(FFP_x, FFP_z, horizontalSignal_mpi_mat, 4, horizontalSignal_mpi_mat);  view(2); 
-%     xlim([-MPIparams.FOV_x/2 MPIparams.FOV_x/2]); ylim([-MPIparams.FOV_z/2 MPIparams.FOV_z/2])
+
         
     if ((pos_idx == 1) || pos_idx == length(pos))
         plotif = 1;
