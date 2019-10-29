@@ -5,7 +5,6 @@ function [colinearIMG, transverseIMG] = generatePSFImages(SPIOparams, colinearPS
 
     colinearIMG = cell(numParticle, numAngle);
     transverseIMG = cell(numParticle, numAngle);
-    endTime = 0;
     for m=1:numParticle
         tempDistribution = SPIOparams.SPIOdistribution(:,:,m);
 
@@ -25,10 +24,8 @@ function [colinearIMG, transverseIMG] = generatePSFImages(SPIOparams, colinearPS
         % time domain
         imgF = fft2(tempDistribution, size(colinearPSF{1},1), size(colinearPSF{1},2));
         for k=1:numAngle
-            tic
             colinearIMG{m,k} = fftshift(ifft2(imgF.*fft2(colinearPSF{m,k})));    
             transverseIMG{m,k} = fftshift(ifft2(imgF.*fft2(transversePSF{m,k})));   
         end
-        endTime = endTime + toc;
     end
 end

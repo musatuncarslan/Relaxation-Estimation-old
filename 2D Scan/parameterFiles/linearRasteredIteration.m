@@ -1,4 +1,4 @@
-function [startIter, endIter, numSamplesPerIter] = linearRasteredIteration(MPIparams, Physicsparams)
+function [startIter, endIter, samplesPerIter] = linearRasteredIteration(MPIparams, Physicsparams)
 
     f_drive = MPIparams.f_drive;
     fs = Physicsparams.fs;
@@ -8,37 +8,24 @@ function [startIter, endIter, numSamplesPerIter] = linearRasteredIteration(MPIpa
     time = MPIparams.time;
     traversedFOVz = MPIparams.traversedFOVz;
 
-
-    f_drive_temp = f_drive;
-    divider = 1;
-    count = -1;
-    while (mod(f_drive_temp, divider) == 0)
-        count = count + 1;
-        divider = divider*10;   
-    end
-    count = count;
-
     robotSpeed = FOV_z/time; % robot arm movement speed (m/s)
-    bFOVz = -FOV_z/2; % beginning point of FOV in z-axis (m)
-    t1 = round((traversedFOVz(1)-bFOVz)/robotSpeed, count);
-    t2 = round((traversedFOVz(2)-bFOVz)/robotSpeed, count);
     total_time = (traversedFOVz(2)-traversedFOVz(1))/robotSpeed;
 
-    numPeriod = round(total_time*f_drive); % number of periods on the selected portion of a single line
-    a = gcd(fs*total_time, numPeriod); % find the greatest common divisor of total number of samples and total number of periods per line
-    div = divisors(a); % find the divisors of gcd (these numbers divide both total number of samples and number of periods per line)
+    numPeriods = round(total_time*f_drive); % number of periods on the selected portion of a single line
+    div = divisors(numPeriods); % find the divisors of gcd (these numbers divide both total number of samples and number of periods per line)
     numIters = div(div>100 & div < 1000); % use the middle number of divisors as a rule of thumb for number of iterations to solve the whole problem
     if isempty(numIters)
-        numIters = div(1);
+        numIters = div(end);
         msg = sprintf('Low number of iterations, iteration number is chosen as highest possible, %i.\n', numIters);
         fprintf(msg);
     end 
 
 
     numIters = numIters(ceil(end/2));
-    numSamplesPerIter = fs*total_time/numIters;
+    periodsPerIter = numPeriods/numIters;
+    samplesPerIter = periodsPerIter*fs/f_drive;
 
-    startIter = round((t1*fs)/numSamplesPerIter);
-    endIter = startIter+numIters;
+    startIter = round(traversedFOVz(1)/f_drive/robotSpeed);
+    endIter = startIter+numIters-1;
     
 end

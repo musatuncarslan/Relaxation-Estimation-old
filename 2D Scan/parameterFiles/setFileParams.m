@@ -11,9 +11,9 @@ function [fileObj, signal_size, chunk] = setFileParams(fileName, Physicsparams, 
     fileObj.Simparams = Simparams;
 
     % create space for the simulation data
-    signal_size = Simparams.numSamplesPerIter/Simparams.downsample;
+    signal_size = Simparams.numSamplesPerIter/Simparams.downsample+2;
     chunk = Simparams.numSamplesPerIter/Simparams.downsample;
-    numIters = Simparams.endIter-Simparams.startIter;
+    numIters = Simparams.numIters;
     fileObj.horizontalSignal_mpi_mat(numIters,signal_size) = 0;
     fileObj.FFP_x(numIters,signal_size) = 0;
     fileObj.FFP_z(numIters,signal_size) = 0;

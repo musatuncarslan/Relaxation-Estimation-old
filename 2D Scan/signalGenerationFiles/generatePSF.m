@@ -28,10 +28,8 @@ function [colinearPSF,transversePSF, X, Z] = generatePSF(MPIparams, SPIOparams, 
         kb = 1.3806488e-23;
         T = 300;
         k = (0.1*pi*d^3)/(kb*T);
-        endTime = 0;
 
         for l=1:numAngle
-            tic
             e = transpose([X(:), zeros(size(X,1)*size(X,2), 1), Z(:)]);
             R = roty(FFP_uniqueAngle(l));
 
@@ -61,7 +59,6 @@ function [colinearPSF,transversePSF, X, Z] = generatePSF(MPIparams, SPIOparams, 
 
             arg_trans = Gxx*Gzz*rotX.*rotZ./Hxyz.^2; arg_trans(isnan(arg_trans)) = 0;
             transversePSF{m, l} = (Tenv - Nenv).*arg_trans;
-            endTime = endTime + toc;
         end
     end
 end

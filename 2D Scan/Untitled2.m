@@ -12,7 +12,7 @@ Physicsparams = setPhysicsParams(); % physics parameters
 MPIparams = setMPIParams(Physicsparams, 20); % MPI machine parameters
 
 fig = figure('Position', [560 240 800 600]); hold on;
-pos = 512-80:512+80;
+pos = 512;
 for pos_idx=1:length(pos)
     SPIOparams = setSPIOParams(Physicsparams, pos(pos_idx), 2e-6); % SPIO parameters
     Simparams = setSimulationParams(MPIparams, Physicsparams); % Simulation parameters

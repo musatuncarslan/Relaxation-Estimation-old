@@ -27,9 +27,9 @@ function MPIparams = setMPIParams(Physicsparams, rs)
     
     % for linear rastered
     MPIparams.time = MPIparams.FOV_z*MPIparams.Gzz/MPIparams.slewRate; % time (seconds)
-    MPIparams.traversedFOVz = [-MPIparams.FOV_z/MPIparams.time/MPIparams.f_drive/2 MPIparams.FOV_z/MPIparams.time/MPIparams.f_drive/2]; % traversed fov in the simulation in z-axis (m)
-    % for fixed
-    MPIparams.cycle = 1; % number of cycles on the fixed position
+    MPIparams.traversedFOVz = [-0.01 0.01]; % traversed fov in the simulation in z-axis (m)
+    % [-MPIparams.FOV_z/MPIparams.time/MPIparams.f_drive/2 MPIparams.FOV_z/MPIparams.time/MPIparams.f_drive/2]; for fixed
+    MPIparams.cycle = 5; % number of cycles on the fixed position
     MPIparams.ffpPosition = [0, 0]; % ffp position in x and z coordinates
     
     % related to time constant estimation

@@ -16,8 +16,6 @@ function [signal] = generateSignals(colinearIMG, transverseIMG, FFPparams, MPIpa
     r_t = SPIOparams.r_t;
 
     % generate colinear and transverse signals using interpolation
-    endTime = 0;
-
     x = (-FOV_x/2:dx:FOV_x/2);
     z = (-FOV_z/2:dz:FOV_z/2);
     numAngle = length(FFP_uniqueAngle);
@@ -28,28 +26,23 @@ function [signal] = generateSignals(colinearIMG, transverseIMG, FFPparams, MPIpa
     for l=1:numSPIO
         for k=1:numAngle
             angleIdx = (FFP_angle == FFP_uniqueAngle(k));
-            tic;
             colinearSignal(l, angleIdx) = interp2(x,z,colinearIMG{l, k}, FFP_x(angleIdx), FFP_z(angleIdx), 'spline');
             transverseSignal(l, angleIdx) = interp2(x,z,transverseIMG{l, k}, FFP_x(angleIdx), FFP_z(angleIdx), 'spline');
-            endTime = endTime + toc;
         end
     end
 
 
     % generate horizontal and vertical signals using relaxed colinear and
     % transverse signals.
-    endTime = 0;
     horizontalSignal = zeros(size(colinearSignal));
     verticalSignal = zeros(size(colinearSignal));
     for l=1:numSPIO
         for k = 1:numAngle
             angleIdx = (FFP_angle == FFP_uniqueAngle(k));
-            tic;
             horizontalSignal(l, angleIdx) = colinearSignal(l, angleIdx).*FFP_speed(angleIdx).*cosd(FFP_angle(angleIdx)) ...
                 - transverseSignal(l, angleIdx).*FFP_speed(angleIdx).*sind(FFP_angle(angleIdx));
             verticalSignal(l, angleIdx) = colinearSignal(l, angleIdx).*FFP_speed(angleIdx).*sind(FFP_angle(angleIdx)) ...
                 + transverseSignal(l, angleIdx).*FFP_speed(angleIdx).*cosd(FFP_angle(angleIdx));    
-            endTime = endTime + toc;
         end
     end
 
